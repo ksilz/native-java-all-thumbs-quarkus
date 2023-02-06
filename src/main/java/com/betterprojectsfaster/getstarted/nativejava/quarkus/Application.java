@@ -23,11 +23,12 @@ public class Application implements QuarkusApplication {
   public int run(String... args) throws Exception {
     try {
       System.out.println();
-      System.out.println("**********************");
-      System.out.println("*   ALL THUMBS 1.0   *");
-      System.out.println("**********************");
+      System.out.println("********************************");
+      System.out.println("*   ALL THUMBS QUARKUS 1.0.1   *");
+      System.out.println("********************************");
       System.out.println();
       System.out.println("This program will create thumbnails for all JPG, PNG, and GIF pictures in the current directory.");
+      System.out.println();
 
       var pid = ProcessHandle.current().pid();
 
