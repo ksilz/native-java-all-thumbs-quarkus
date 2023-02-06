@@ -113,6 +113,7 @@ public class Application implements QuarkusApplication {
       System.out.println("Press ENTER to STOP");
       new Scanner(System.in).nextLine();
     } catch (IOException e) {
+      System.err.println("ERROR: Fatal error calculating thumbnails!");
       e.printStackTrace();
       System.exit(1);
     }
