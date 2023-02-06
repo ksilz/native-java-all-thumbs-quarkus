@@ -1,15 +1,15 @@
 package com.betterprojectsfaster.getstarted.nativejava.quarkus;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.pdf.PdfWriter;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
-import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.name.Rename;
-import net.coobird.thumbnailator.resizers.configurations.AlphaInterpolation;
-import net.coobird.thumbnailator.resizers.configurations.Antialiasing;
-import net.coobird.thumbnailator.resizers.configurations.Rendering;
-import net.coobird.thumbnailator.resizers.configurations.ScalingMode;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -27,7 +27,8 @@ public class Application implements QuarkusApplication {
       System.out.println("*   ALL THUMBS QUARKUS 1.0.1   *");
       System.out.println("********************************");
       System.out.println();
-      System.out.println("This program will create thumbnails for all JPG, PNG, and GIF pictures in the current directory.");
+      System.out.println(
+          "This program will convert all JPG, PNG, and GIF pictures in the current directory into PDF.");
       System.out.println();
 
       var pid = ProcessHandle.current().pid();
@@ -41,7 +42,7 @@ public class Application implements QuarkusApplication {
       var files = inputDir.listFiles();
 
       if (files != null && files.length > 0) {
-        List<String> pictureFiles =
+        List<File> pictureFiles =
             Arrays.stream(files)
                 .filter(
                     f ->
@@ -49,47 +50,59 @@ public class Application implements QuarkusApplication {
                             && (f.getName().endsWith(".jpg")
                                 || f.getName().endsWith(".gif")
                                 || f.getName().endsWith(".png")))
-                .map(File::getName)
                 .toList();
 
         if (pictureFiles.size() > 0) {
           var currentDir = inputDir.getCanonicalPath();
-          var outputDir = new File(currentDir + File.separator + "thumbnails");
+          var outputDir = new File(currentDir + File.separator + "pdf");
           var goOn = true;
 
           if (outputDir.exists() == false) {
             goOn = outputDir.mkdir();
 
             if (goOn == false) {
-              System.err.println("ERROR: Could not create 'thumbnails' directory!");
+              System.err.println("ERROR: Could not create 'pdf' directory!");
             }
           }
 
           if (goOn) {
-            var pictureArray = pictureFiles.toArray(new String[0]);
             System.out.println(
-                "Creating thumbnails for "
-                    + pictureArray.length
-                    + " pictures in the 'thumbnails' directory...");
+                "Creating PDFs for " + pictureFiles.size() + " pictures in the 'pdf' directory...");
+            var counter = 1;
+            System.out.println();
             var start = System.currentTimeMillis();
 
-            Thumbnails.of(pictureArray)
-                .allowOverwrite(true)
-                .size(400, 400)
-                .outputFormat("jpg")
-                .alphaInterpolation(AlphaInterpolation.QUALITY)
-                .antialiasing(Antialiasing.ON)
-                .outputQuality(1f)
-                .rendering(Rendering.QUALITY)
-                .scalingMode(ScalingMode.PROGRESSIVE_BILINEAR)
-                .keepAspectRatio(true)
-                .toFiles(outputDir, Rename.NO_CHANGE);
+            for (var aFile : pictureFiles) {
+              System.out.print("\r  File " + counter);
+              var document = new Document(PageSize.LETTER);
+              var baseName = FilenameUtils.getBaseName(aFile.getName());
+              var pdfFile = new File(outputDir, baseName + ".pdf");
+              var pdfOutputStream = new FileOutputStream(pdfFile);
+              var writer = PdfWriter.getInstance(document, pdfOutputStream);
+
+              writer.open();
+              document.open();
+
+              var imagePath = aFile.toPath().toAbsolutePath().toString();
+              var image = Image.getInstance(imagePath);
+
+              image.setAbsolutePosition(0, 0);
+              image.scaleToFit(PageSize.LETTER);
+              document.add(image);
+
+              document.close();
+              writer.close();
+              counter++;
+            }
 
             var stop = System.currentTimeMillis();
             var duration = (stop - start) / 1000f;
+
             var formatter = new DecimalFormat("###,###.##");
             var formattedDuration = formatter.format(duration);
-            System.out.println("Done creating thumbnails in " + formattedDuration + " seconds. ");
+            System.out.println();
+            System.out.println();
+            System.out.println("Done creating PDFs in " + formattedDuration + " seconds. ");
             System.out.println("Now sleeping for 10 seconds, hoping for garbage collection.");
             System.gc();
 
