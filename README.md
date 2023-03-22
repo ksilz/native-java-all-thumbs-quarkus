@@ -1,7 +1,5 @@
-## Test Images
+## What's This?
 
-Used test images from here: https://sourceforge.net/projects/testimages/files/SAMPLING/16BIT/RGB/
-
-- [first set of test files](https://sourceforge.net/projects/testimages/files/SAMPLING/16BIT/RGB/SAMPLING_16BIT_RGB_2448x2448.tar.bz2/download)
-- [second set of test files](https://sourceforge.net/projects/testimages/files/SAMPLING/16BIT/RGB/SAMPLING_16BIT_RGB_1200x1200.tar.bz2/download)
-- [third set of test files](https://sourceforge.net/projects/testimages/files/SAMPLING/16BIT/RGB/SAMPLING_16BIT_RGB_2400x2400.tar.bz2/download)
+This app belongs to
+the ["Getting Started With Native Java"](https://betterprojectsfaster.com/guide/getting-started-native-java/#sample-application)
+guide from the ["Better Projects Faster"](https://betterprojectsfaster.com) site. Please see there for details.
