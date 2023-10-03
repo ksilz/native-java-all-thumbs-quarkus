@@ -8,6 +8,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryManagerMXBean;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -25,12 +27,22 @@ public class PdfCreator {
           "This program will convert all JPG, PNG, and GIF pictures in the current directory into PDF.");
       System.out.println();
       System.out.println(
-          "JVM: "
+          "JVM:                "
               + SystemUtils.JAVA_VM_VENDOR
               + " "
               + SystemUtils.JAVA_VM_NAME
               + " "
               + SystemUtils.JAVA_VM_VERSION);
+      String garbageCollectors = "(???)";
+
+      var gcMxBeans = ManagementFactory.getGarbageCollectorMXBeans();
+
+      if (gcMxBeans != null && !gcMxBeans.isEmpty()) {
+        var names = gcMxBeans.stream().map(MemoryManagerMXBean::getName).toList();
+        garbageCollectors = String.join(", ", names);
+      }
+
+      System.out.println("Garbage collectors: " + garbageCollectors);
       System.out.println();
 
       var pid = ProcessHandle.current().pid();
@@ -70,12 +82,8 @@ public class PdfCreator {
             var start = System.currentTimeMillis();
 
             for (var i = 1; i <= NUMBER_OF_RUNS; i++) {
-              System.out.println();
-              System.out.println("Pass " + i + "/" + NUMBER_OF_RUNS);
-              var counter = 1;
 
               for (var aFile : pictureFiles) {
-                System.out.print("\r  File " + counter);
                 var document = new Document(PageSize.LETTER);
                 var baseName = FilenameUtils.getBaseName(aFile.getName());
                 var pdfFile = new File(outputDir, baseName + ".pdf");
@@ -94,7 +102,6 @@ public class PdfCreator {
 
                 document.close();
                 writer.close();
-                counter++;
               }
             }
 
@@ -103,7 +110,6 @@ public class PdfCreator {
 
             var formatter = new DecimalFormat("###,###.##");
             var formattedDuration = formatter.format(duration);
-            System.out.println();
             System.out.println();
             System.out.println("Done creating PDFs in " + formattedDuration + " seconds. ");
             System.out.println();

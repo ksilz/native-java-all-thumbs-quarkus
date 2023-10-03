@@ -10,7 +10,7 @@ public class Application implements QuarkusApplication {
   public int run(String... args) throws Exception {
     System.out.println();
     System.out.println("********************************");
-    System.out.println("*   ALL THUMBS QUARKUS 1.1.1   *");
+    System.out.println("*   ALL THUMBS QUARKUS 1.1.3   *");
     System.out.println("********************************");
     System.out.println();
 
